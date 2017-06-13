@@ -16,6 +16,5 @@
     "url": "git+ssh://git@github.com/F1LT3R/https-digest-auth-server.git"
   },
   "author": "F1LT3R",
-  "license": "CC-BY-ND-4.0",
-  "homepage": "git+ssh://git@github.com/F1LT3R/macdonaldweyers_com#readme"
+  "license": "CC-BY-ND-4.0"
 }
