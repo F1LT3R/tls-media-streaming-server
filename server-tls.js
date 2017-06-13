@@ -92,7 +92,7 @@ const requestHandler = (req, res) => {
         const total = stat.size
         const positions = range.replace(/bytes=/, '').split('-')
 
-		const start = parseInt(positions[0], 10)
+        const start = parseInt(positions[0], 10)
         let end = positions[1] ? parseInt(positions[1], 10) : total - 1
         let chunksize = (end - start) + 1
 
@@ -114,7 +114,11 @@ const requestHandler = (req, res) => {
             'Content-Type': 'video/mp4'
         })
 
-        const streamOpts = {autoClose: true, start, end}
+        const streamOpts = {
+            autoClose: true,
+            start,
+            end
+        }
 
         const stream = fs.createReadStream(filePath, streamOpts)
             .on('open', () => stream.pipe(res))
@@ -122,7 +126,7 @@ const requestHandler = (req, res) => {
                 res.end(err)
                 console.log(err)
             })
-            .on('close', function () {
+            .on('close', function() {
                 console.log('reponse closed')
             })
             .on('end', () => {
@@ -141,7 +145,7 @@ const requestHandler = (req, res) => {
         readStream.pipe(res)
 
         return
-	}
+    }
 }
 
 const httpsServer = https.createServer(authenticator, httpsOptions, requestHandler)
@@ -151,7 +155,7 @@ httpsServer.listen(443)
 // Redirect HTTP (80) to HTTPS
 http.createServer((req, res) => {
     res.writeHead(301, {
-            Location: `https://${req.headers.host}${req.url}`
+        Location: `https://${req.headers.host}${req.url}`
     })
 
     res.end()
