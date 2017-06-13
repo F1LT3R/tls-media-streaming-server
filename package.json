@@ -1,0 +1,21 @@
+{
+  "name": "https-digest-auth-server",
+  "version": "1.0.0",
+  "description": "a very basic https digest-auth web server with mp4 byte-range streaming",
+  "private": true,
+  "main": "server-tls.js",
+  "dependencies": {
+    "http-auth": "^3.1.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/F1LT3R/https-digest-auth-server.git"
+  },
+  "author": "F1LT3R",
+  "license": "CC-BY-ND-4.0",
+  "homepage": "git+ssh://git@github.com/F1LT3R/macdonaldweyers_com#readme"
+}
