@@ -16,8 +16,8 @@ Note: there are a few 0-byte files in this example. They are intentionally left 
 - `git clone git@github.com:f1lt3r/http-digest-auth-server.git`
 - `cd http-digest-auth-server`
 - `npm install`
-- `npm install -g htdigest' (encrypted user/pass generation w/ nonce)
-- `npm install -g pm2' (keep server alive)
+- `npm install -g htdigest` (encrypted user/pass generation w/ nonce)
+- `npm install -g pm2` (keep server alive)
 - allow ports 80 and 443 in your firewall
 - place a video file and/or html file into your `private` folder
 - `htdigest Users <username>` (see Adding Users below)
