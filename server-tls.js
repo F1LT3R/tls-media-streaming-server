@@ -57,6 +57,10 @@ const requestHandler = (req, res) => {
 
     let url = req.url
 
+    if (url === '/') {
+    	url = 'index.html'
+    }
+
     if (url[0] === '/') {
         url = url.substr(1)
     }
@@ -67,15 +71,6 @@ const requestHandler = (req, res) => {
         return
     }
 
-    if (url === '/') {
-        res.writeHead(200, {
-            'Content-Type': 'text/html'
-        })
-
-        res.end('<h1>Welcome</h1>')
-
-        return
-    }
 
     const file = path.parse(url)
     const filePath = path.join(__dirname, 'private', url)
@@ -127,7 +122,7 @@ const requestHandler = (req, res) => {
                 console.log(err)
             })
             .on('close', function() {
-                console.log('reponse closed')
+                console.log('response closed')
             })
             .on('end', () => {
                 console.log('response stream ended')
