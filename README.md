@@ -1,6 +1,6 @@
 # TLS Media Streaming Server
 
-A simple SSL web server with .mp4 video streaming support:
+An SSL HTTP server with ByteRange MP4 video streaming support:
 
 - Uses an SSL certificate for HTTPS (PROD & DEV)
 - Redirects traffic from HTTP port 80 to HTTPS 443.
