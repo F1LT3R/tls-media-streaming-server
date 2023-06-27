@@ -20,9 +20,55 @@ Note: there are a few 0-byte files in this example. They are intentionally left 
 - `npm install -g pm2` (keep server alive)
 - `cp -r ./secrets-example ./secrets`
 - Populate your `./secrets` certificate files and htdigest file. 
-- allow ports 80 and 443 in your firewall
+- DEV: Create your Dev Env  SSL Certificates (see below)
+- PROD: Allow ports 80 and 443 in your firewall if you are in production
 - `htdigest ./secrets/htdigest Users <NEW-USERNAME>` (see Adding Users below)
-- `DOMAIN=<YOUR-DOMAIN> pm2 start ./server` (start the server)
+- PROD: `DOMAIN=<YOUR-DOMAIN> pm2 start ./server` (start the server)
+
+## Create Dev Env SSL Certificate
+
+```shell
+# Create your cert pem 
+openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365
+
+# You will be asked to fill out the following
+Enter PEM pass phrase: <PASSWORD>
+Verifying - Enter PEM pass phrase: <PASSWORD>
+-----
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:New York
+Locality Name (eg, city) []:New York
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:DEV.INC
+Organizational Unit Name (eg, section) []: <BLANK>
+Common Name (e.g. server FQDN or YOUR name) []:localhost
+Email Address []:admin@dev.inc
+
+
+# Create your key pem file
+openssl rsa -in keytmp.pem -out key.pem
+# You will see this password prompt:
+
+#Enter pass phrase for keytmp.pem: <PASSWORD>
+
+# Remove your temporary RSA key file
+rm keytmp.pem
+
+
+# Move your cert and key  to the .secrets folder
+mv cert.pem .secrets/DEV.crt.pem
+mv key.pem .secrets/DEV.key.pem
+```
+
+- Run the server.
+- Launch the browser at: https://localhost:8443/
+- Type `thisisunsafe` (Bypasses SSL cert in Chromium browsers)
 
 ## Secrets
 
@@ -30,33 +76,28 @@ The `./secrets` directory contains things that you do not want to share publicly
 
 For example:
 
-- Certification
+- SSL Certification
+	+ DEV Cert file
+	+ DEV Key file
 	+ CA Bundle file
 	+ Key file
 	+ Cert file
 - htdigest file (contains encrypted passwords)
-
-The `SECRETS/SOURCE` file below should updated to reflect the real paths to your certificates and `htdigest` file (where your user/passwords are stored).
-
-```shell
-export CA_PATH="/<user>/SECRETS/<domain>.ca-bundle"
-export KEY_PATH="/<user>/SECRETS/<domain>.key"
-export CRT_PATH="/<user>/SECRETS/<domain>.crt"
-export DIGEST_PATH="/<user>/SECRETS/htdigest"
-```
 
 ## Adding Users
 
 To add a user to the `htdigest` file:
 
 ```shell
-cd SECRETS/SOURCE
-htdigest Users <username>
-
+# It appears you MUST cd into the dir you are updating your htdigest file
+cd ./secrets
+# Digest file can be blank text file to start
+# Eg: htdigest ./secrets/example.com.htdigest Users <username>
+htdigest ./secrets/example.com.htdigest Users alice
 # You will be prompted for a password and confirmation
 ```
 
-## Generating Certificates
+## Generating SSL Certificates for Production
 
 I am using NameCheap SSL, Ubuntu 18 and a Digital Ocean Droplet.
 

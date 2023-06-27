@@ -1,158 +1,190 @@
-const https = require('https')
-const http = require('http')
-const fs = require('fs')
-const auth = require('http-auth')
-const path = require('path')
-const useragent = require('useragent')
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+const auth = require('http-auth');
+const path = require('path');
+const useragent = require('useragent');
 
-const CA_PATH = process.env.CA_PATH
-const KEY_PATH = process.env.KEY_PATH
-const CRT_PATH = process.env.CRT_PATH
-const DIGEST_PATH = process.env.DIGEST_PATH
+const DOMAIN = process.env.DOMAIN;
+console.log(`Loading SSL configuration for DOMAIN: ${DOMAIN}`);
+const ENVIRONMENT = process.env.NODE_ENV === 'PRODUCTION' && 'PRODUCTION' || 'DEVELOPMENT';
+console.log(`(Environment: ${ENVIRONMENT})`);
+
+let CRT_PATH = `.secrets/${DOMAIN}.crt`;
+const CA_PATH = `.secrets/${DOMAIN}.ca-bundle`;
+const DIGEST_PATH = `.secrets/${DOMAIN}.htdigest`;
+let KEY_PATH = `.secrets/${DOMAIN}.key`;
+
+let TLS_PORT = 443;
+let HTP_PORT = 80;
+
+if (ENVIRONMENT === 'DEVELOPMENT') {
+    TLS_PORT = 8443;
+    HTP_PORT = 8080;
+    CRT_PATH = `.secrets/DEV.crt.pem`;
+    KEY_PATH = `.secrets/DEV.key.pem`;
+}
 
 const authenticator = auth.digest({
     realm: 'Users',
     authType: 'digest',
     file: DIGEST_PATH
 })
+console.log(`htdigest Configuration: LOADED`);
 
-const ca = []
-let certificate = []
+let ca = null;
+if (ENVIRONMENT === 'PRODUCTION') {
+    ca = [];
+    let certificate = []
+    const chain = fs.readFileSync(CA_PATH, 'utf8').toString().split('\n')
+    for (let i = 0, len = chain.length; i < len; i++) {
+        const line = chain[i]
 
-const chain = fs.readFileSync(CA_PATH, 'utf8').toString().split('\n')
+        if (!(line.length !== 0)) {
+            continue
+        }
 
-for (let i = 0, len = chain.length; i < len; i++) {
-    const line = chain[i]
+        certificate.push(line)
 
-    if (!(line.length !== 0)) {
-        continue
+        if (line.match(/-END CERTIFICATE-/)) {
+            ca.push(certificate.join('\n'))
+            certificate = [];
+        }
     }
-
-    certificate.push(line)
-
-    if (line.match(/-END CERTIFICATE-/)) {
-        ca.push(certificate.join('\n'))
-        certificate = []
-    }
+    console.log(`Certificate Authority Bundle: LOADED`);
 }
 
-const key = fs.readFileSync(KEY_PATH).toString()
-const cert = fs.readFileSync(CRT_PATH).toString()
+const key = fs.readFileSync(KEY_PATH).toString();
+console.log(`SSL Certificate Key: LOADED`);
+const cert = fs.readFileSync(CRT_PATH).toString();
+console.log(`SSL Certificate: LOADED`);
 
 const httpsOptions = {
     ca,
     key,
     cert
-}
+};
 
 const headers = {
     mp4: 'video/mp4',
-    html: 'text/html'
-}
+    html: 'text/html',
+    css: 'text/css',
+    jpg: 'image/jpeg',
+    mp3: 'audio/mpeg',
+    svg: 'image/svg+xml',
+    pdf: 'application/pdf',
+    ico: 'image/vnd.microsoft.icon'
+};
 
-const maxChunk = 1024 * 1024
+const streaming = ['mp4', 'mp3']; 
+
+const maxChunk = 512 * 512;
 
 const requestHandler = (req, res) => {
-    console.log()
-
     let url = req.url
 
     if (url === '/') {
-    	url = 'index.html'
+    	url = 'index.html';
     }
 
     if (url[0] === '/') {
-        url = url.substr(1)
+        url = url.substr(1);
     }
-
-    console.log(`request: ${url}`)
 
     if (url === 'favicon.ico') {
-        return
+        return;
     }
 
+    const file = path.parse(url);
+    console.log(`REQUEST: ${url}`);
 
-    const file = path.parse(url)
-    const filePath = path.join(__dirname, 'private', url)
-    const stat = fs.statSync(filePath)
+    const filePath = path.resolve(__dirname, '..', 'site', url);
+    const stat = fs.statSync(filePath);
+    const ext = file.ext.slice(1);
+    const contentType = headers[ext];
 
-    if (file.ext === '.mp4') {
-        const range = req.headers.range
-        console.log(req.headers.range);
+    if (streaming.includes(ext)) {
+        const range = req.headers.range;
 
         if (!range) {
-            console.log('NO RANGE!')
-            return res.sendStatus(416)
+            console.log(`! NO RANGE FOR: ${url}`);
+            return res.sendStatus(416);
         }
 
         const total = stat.size
-        const positions = range.replace(/bytes=/, '').split('-')
+        const positions = range.replace(/bytes=/, '').split('-');
 
         const start = parseInt(positions[0], 10);
-        let end = positions[1] ? parseInt(positions[1], 10) : total - 1
-        let chunksize = (end - start) + 1
+        let end = positions[1] ? parseInt(positions[1], 10) : total - 1;
+        let chunksize = (end - start) + 1;
 
-        const agent = useragent.lookup(req.headers['user-agent'])
+        const agent = useragent.lookup(req.headers['user-agent']);
 
         if (agent.family !== 'Safari' && agent.family !== 'Mobile Safari') {
             if (chunksize > maxChunk) {
-                end = start + maxChunk - 1
-                chunksize = (end - start) + 1
+                end = start + maxChunk - 1;
+                chunksize = (end - start) + 1;
             }
         }
 
-        const contentRange = `bytes ${start}-${end}/${total}`
+        const contentRange = `bytes ${start}-${end}/${total}`;
 
         res.writeHead(206, {
             'Content-Range': contentRange,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize,
-            'Content-Type': 'video/mp4'
-        })
+            'Content-Type': contentType
+        });
 
         const streamOpts = {
             autoClose: true,
             start,
             end
-        }
+        };
 
         const stream = fs.createReadStream(filePath, streamOpts)
-            .on('open', () => stream.pipe(res))
+            .on('open', () => {
+                console.log(`STREAM OPENED: ${url}`);
+                stream.pipe(res);
+            })
             .on('error', err => {
-                res.end(err)
-                console.log(err)
+                res.end(err);
+                console.log(err);
             })
             .on('close', function() {
-                console.log('response closed')
+                console.log(`STREAM CLOSED: ${url}`);
             })
             .on('end', () => {
-                console.log('response stream ended')
-            })
+                console.log(`STREAM ENDED: ${url}`);
+            });
 
         return
     } else {
         res.writeHead(200, {
-            'Content-Type': headers[file.ext],
+            'Content-Type': contentType,
             'Content-Length': stat.size
         })
 
-        const readStream = fs.createReadStream(filePath)
+        const readStream = fs.createReadStream(filePath);
 
-        readStream.pipe(res)
+        readStream.pipe(res);
 
-        return
+        return;
     }
 }
 
-const httpsServer = https.createServer(authenticator, httpsOptions, requestHandler)
+const httpsServer = https.createServer(authenticator, httpsOptions, requestHandler);
+httpsServer.listen(TLS_PORT);
+console.log(`Running HTTPS server on ${TLS_PORT}`);
 
-httpsServer.listen(443)
-
-// Redirect HTTP (80) to HTTPS
+// Redirect HTTP to HTTPS (80 --> 443 | 8080 --> 8443)
 http.createServer((req, res) => {
     res.writeHead(301, {
-        Location: `https://${req.headers.host}${req.url}`
-    })
+        Location: `https://${req.headers.host}${req.url}`,
+    });
 
-    res.end()
-}).listen(80)
+    res.end();
+}).listen(HTP_PORT);
+console.log(`Running HTTP server on ${HTP_PORT}`);
+
+console.log(`https://localhost:${TLS_PORT}`);
