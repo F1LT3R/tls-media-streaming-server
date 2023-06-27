@@ -7,7 +7,7 @@ const useragent = require('useragent');
 
 const DOMAIN = process.env.DOMAIN;
 console.log(`Loading SSL configuration for DOMAIN: ${DOMAIN}`);
-const ENVIRONMENT = process.env.NODE_ENV === 'PRODUCTION' && 'PRODUCTION' || 'DEVELOPMENT';
+const ENVIRONMENT = process.env.NODE_ENV === 'production' && 'production' || 'development';
 console.log(`(Environment: ${ENVIRONMENT})`);
 
 let CRT_PATH = `.secrets/${DOMAIN}.crt`;
@@ -18,7 +18,7 @@ let KEY_PATH = `.secrets/${DOMAIN}.key`;
 let TLS_PORT = 443;
 let HTP_PORT = 80;
 
-if (ENVIRONMENT === 'DEVELOPMENT') {
+if (ENVIRONMENT === 'development') {
     TLS_PORT = 8443;
     HTP_PORT = 8080;
     CRT_PATH = `.secrets/DEV.crt.pem`;
@@ -33,7 +33,7 @@ const authenticator = auth.digest({
 console.log(`htdigest Configuration: LOADED`);
 
 let ca = null;
-if (ENVIRONMENT === 'PRODUCTION') {
+if (ENVIRONMENT === 'production') {
     ca = [];
     let certificate = []
     const chain = fs.readFileSync(CA_PATH, 'utf8').toString().split('\n')

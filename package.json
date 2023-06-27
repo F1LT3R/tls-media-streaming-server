@@ -1,7 +1,7 @@
 {
-  "name": "https-digest-auth-server",
+  "name": "tls-streaming-media-server",
   "version": "1.0.0",
-  "description": "a very basic https digest-auth web server with mp4 byte-range streaming",
+  "description": "A simple SSL web server with .mp4 video streaming support.",
   "private": true,
   "main": "server/index.js",
   "dependencies": {
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/F1LT3R/https-digest-auth-server.git"
+    "url": "git+ssh://git@github.com/F1LT3R/tls-streaming-media-server.git"
   },
   "author": "F1LT3R",
   "license": "CC-BY-ND-4.0"
