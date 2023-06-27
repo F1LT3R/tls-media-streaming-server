@@ -1,13 +1,11 @@
-# NodeJs TLS Media Server
+# TLS Media Streaming Server
 
-This is a basic example of a web server that I set up to share videos with family members across the ocean.
+A simple SSL web server with .mp4 video streaming support:
 
-The server has the following features:
-
-- Uses a certificate for HTTPS
-- Redirects traffic from HTTP port 80 to HTTPS
-- Can stream MP4 videos as byte ranges
-- Can serve HTML pages
+- Uses an SSL certificate for HTTPS (PROD & DEV)
+- Redirects traffic from HTTP port 80 to HTTPS 443.
+- Can stream MP4 videos as byte ranges.
+- Can serve HTML pages, and a few content types like .css, jpg, .etc.
 
 Note: there are a few 0-byte files in this example. They are intentionally left blank, such as certificate files used to server a trusted HTTPS page. You should replace these with real content.
 
