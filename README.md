@@ -1,4 +1,4 @@
-# NodeJs HTTPS Digest-Auth Server
+# NodeJs TLS Media Server
 
 This is a basic example of a web server that I set up to share videos with family members across the ocean.
 
@@ -13,20 +13,20 @@ Note: there are a few 0-byte files in this example. They are intentionally left 
 
 ## Setup
 
-- `git clone git@github.com:f1lt3r/http-digest-auth-server.git`
-- `cd http-digest-auth-server`
+- `git clone git@github.com:f1lt3r/tls-media-server.git`
+- `cd tls-media-server`
 - `npm install`
 - `npm install -g htdigest` (encrypted user/pass generation w/ nonce)
 - `npm install -g pm2` (keep server alive)
+- `cp -r ./secrets-example ./secrets`
+- Populate your `./secrets` certificate files and htdigest file. 
 - allow ports 80 and 443 in your firewall
-- place a video file and/or html file into your `private` folder
-- `htdigest Users <username>` (see Adding Users below)
-- `source SECRETS/SOURCE` (see Secrets below)
-- `pm2 start server-tls.js` (start the server)
+- `htdigest ./secrets/htdigest Users <NEW-USERNAME>` (see Adding Users below)
+- `DOMAIN=<YOUR-DOMAIN> pm2 start ./server` (start the server)
 
 ## Secrets
 
-The `SECRETS` directory contains things that you do not want to share publicly; like passwords, certificate keys and a source file to provide paths to secret files in your environment.
+The `./secrets` directory contains things that you do not want to share publicly; like passwords, certificate keys and a source file to provide paths to secret files in your environment.
 
 For example:
 
@@ -54,5 +54,22 @@ cd SECRETS/SOURCE
 htdigest Users <username>
 
 # You will be prompted for a password and confirmation
-````
+```
+
+## Generating Certificates
+
+I am using NameCheap SSL, Ubuntu 18 and a Digital Ocean Droplet.
+
+```shell
+mkdir ~/.ssl
+
+openssl req -new -newkey rsa:2048 -nodes -keyout <DOMAIN.TLD>.key -out <DOMAIN.TLD>.csr
+
+# Organization and Unit can be "NA"
+
+# YOU MUST leave Challenge Password and OptionalCompanyName empty!
+```
+
+
+
 

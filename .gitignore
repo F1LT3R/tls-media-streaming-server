@@ -56,3 +56,6 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# Make sure user doesn't acidently push secrets to repo
+.secrets/
