@@ -9,6 +9,8 @@ const DOMAIN = process.env.DOMAIN;
 console.log(`Loading SSL configuration for DOMAIN: ${DOMAIN}`);
 const ENVIRONMENT = process.env.NODE_ENV === 'production' && 'production' || 'development';
 console.log(`(Environment: ${ENVIRONMENT})`);
+const SERVE_DIR = process.env.SERVE;
+console.log(`Serving from ${SERVE_DIR}`);
 
 let CRT_PATH = `.secrets/${DOMAIN}.crt`;
 const CA_PATH = `.secrets/${DOMAIN}.ca-bundle`;
@@ -98,7 +100,7 @@ const requestHandler = (req, res) => {
     const file = path.parse(url);
     console.log(`REQUEST: ${url}`);
 
-    const filePath = path.resolve(__dirname, '..', 'site', url);
+    const filePath = path.resolve(__dirname, '..', SERVE_DIR, url);
     const stat = fs.statSync(filePath);
     const ext = file.ext.slice(1);
     const contentType = headers[ext];

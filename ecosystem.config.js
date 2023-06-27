@@ -5,8 +5,9 @@ module.exports = {
         script: "./server/index.js",
         watch: true,
         env: {
-          "NODE_ENV": "production",
-          "DOMAIN": "example.com"
+          "NODE_ENV": "development",
+          "DOMAIN": "example.com",
+          "SERVE": "site"
         }
       }
   ]

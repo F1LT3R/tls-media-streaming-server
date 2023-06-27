@@ -23,7 +23,8 @@ Note: there are a few 0-byte files in this example. They are intentionally left 
 - DEV: Create your Dev Env  SSL Certificates (see below)
 - PROD: Allow ports 80 and 443 in your firewall if you are in production
 - `htdigest ./secrets/htdigest Users <NEW-USERNAME>` (see Adding Users below)
-- PROD: `DOMAIN=<YOUR-DOMAIN> pm2 start ./server` (start the server)
+- PROD: Update your `DOMAIN` environment variable in `ecosystem.config.js`
+- Start the server: `pm2 start ecosystem.config.js`
 
 ## Create Dev Env SSL Certificate
 
