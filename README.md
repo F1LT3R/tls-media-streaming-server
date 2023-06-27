@@ -1,6 +1,8 @@
 # TLS Media Streaming Server
 
-An SSL HTTP server with ByteRange MP4 video streaming support:
+A simple SSL HTTP server with ByteRange MP4 video streaming support written in NodeJs.
+
+Features:
 
 - Uses an SSL certificate for HTTPS (PROD & DEV)
 - Redirects traffic from HTTP port 80 to HTTPS 443.
