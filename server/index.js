@@ -77,10 +77,11 @@ const headers = {
     mp3: 'audio/mpeg',
     svg: 'image/svg+xml',
     pdf: 'application/pdf',
+    webm: 'video/webm',
     ico: 'image/vnd.microsoft.icon'
 };
 
-const streaming = ['mp4', 'mp3']; 
+const streaming = ['mp4', 'mp3', 'webm']; 
 
 const maxChunk = 512 * 512;
 
