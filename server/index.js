@@ -9,13 +9,15 @@ const DOMAIN = process.env.DOMAIN;
 console.log(`Loading SSL configuration for DOMAIN: ${DOMAIN}`);
 const ENVIRONMENT = process.env.NODE_ENV === 'production' && 'production' || 'development';
 console.log(`(Environment: ${ENVIRONMENT})`);
-const SERVE_DIR = process.env.SERVE;
+const SERVE_DIR = process.env.SERVE_DIR;
 console.log(`Serving from ${SERVE_DIR}`);
 
-let CRT_PATH = `.secrets/${DOMAIN}.crt`;
-const CA_PATH = `.secrets/${DOMAIN}.ca-bundle`;
-const DIGEST_PATH = `.secrets/${DOMAIN}.htdigest`;
-let KEY_PATH = `.secrets/${DOMAIN}.key`;
+const SECRETS_DIR = process.env.SECRETS_DIR;
+
+let CRT_PATH = `${SECRETS_DIR}/${DOMAIN}.crt`;
+const CA_PATH = `${SECRETS_DIR}/${DOMAIN}.ca-bundle`;
+const DIGEST_PATH = `${SECRETS_DIR}/${DOMAIN}.htdigest`;
+let KEY_PATH = `${SECRETS_DIR}/${DOMAIN}.key`;
 
 let TLS_PORT = 443;
 let HTP_PORT = 80;

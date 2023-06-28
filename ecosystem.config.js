@@ -7,7 +7,8 @@ module.exports = {
         env: {
           "NODE_ENV": "development",
           "DOMAIN": "example.com",
-          "SERVE": "site"
+          "SECRETS_DIR": ".secrets",
+          "SERVE_DIR": "./example.com"
         }
       }
   ]
