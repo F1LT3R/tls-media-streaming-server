@@ -76,9 +76,11 @@ const headers = {
     jpg: 'image/jpeg',
     mp3: 'audio/mpeg',
     svg: 'image/svg+xml',
+    png: 'image/png',
     pdf: 'application/pdf',
     webm: 'video/webm',
-    ico: 'image/vnd.microsoft.icon'
+    ico: 'image/vnd.microsoft.icon',
+    manifest: 'application/manifest+json'
 };
 
 const streaming = ['mp4', 'mp3', 'webm']; 
