@@ -11,6 +11,37 @@ Features:
 
 Note: there are a few 0-byte files in this example. They are intentionally left blank, such as certificate files used to server a trusted HTTPS page. You should replace these with real content.
 
+## MP4 Playback Over 3G Networks
+
+This server has been optimized to play back MP4 videos over an average 3G connection without stalling.
+
+In testing, I am able to play video back with a stable 1-2 seconds of unplayed buffer in front of the play head.
+
+The Byte Range has been optimized for playing h264 video at a size of 640 x 360 pixels, and a `-crf` quality of 26.
+
+I am encoding with `ffmpeg` like so:
+
+```shell
+# Within ".original/" dir (not deployed):
+for i in *.mp4; do ffmpeg -i "$i" -c:v libx264 -crf 26 -s 640x360 -c:a aac -movflags faststart "../${i%.*}.mp4"; done
+```
+
+Videos with this encoding target run slightly lower than an average of 275k bytes per second, or 2.2 million bits per second.
+
+You can test your output videos the following way:
+
+```shell
+ffprobe -v quiet -select_streams v:0 -show_entries stream=bit_rate -of default=noprint_wrappers=1:nokey=1 INPUT.MP4
+# 2123581
+```
+
+If you plan to play media at a different rate, update the `maxChunk` variable in `server/index.js` accordingly:
+
+```
+# File: server/index.js
+const maxChunk = 275000;
+```
+
 ## Setup
 
 - `git clone git@github.com:f1lt3r/tls-media-server.git`
