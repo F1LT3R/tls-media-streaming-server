@@ -106,7 +106,18 @@ const requestHandler = (req, res) => {
     console.log(`REQUEST: ${url}`);
 
     const filePath = path.resolve(__dirname, '..', SERVE_DIR, url);
-    const stat = fs.statSync(filePath);
+
+    let stat;
+    try {
+        stat = fs.statSync(filePath);
+    } catch (error) {
+        res.writeHead(404, {"Content-Type": "text/plain"}); 
+        res.write('404 File Not Found\n');
+        console.error(`404: ${req.url}`);
+        res.end();
+        return;
+    }
+
     const ext = file.ext.slice(1);
     const contentType = headers[ext];
 
@@ -174,7 +185,13 @@ const requestHandler = (req, res) => {
 
         const readStream = fs.createReadStream(filePath);
 
-        readStream.pipe(res);
+        readStream.pipe(res).on('error', error => {
+            console.error(error);
+            res.writeHead(500, {"Content-Type": "text/plain"}); 
+            res.write('500 Internal Server Error\n');
+            console.error(`COULD NOT STREAM: ${req.url}`);
+            res.end();
+        });
 
         return;
     }
