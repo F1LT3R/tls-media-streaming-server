@@ -78,6 +78,7 @@ const headers = {
     svg: 'image/svg+xml',
     png: 'image/png',
     pdf: 'application/pdf',
+    vtt: 'text/vtt',
     webm: 'video/webm',
     ico: 'image/vnd.microsoft.icon',
     manifest: 'application/manifest+json'
