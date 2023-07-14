@@ -88,7 +88,8 @@ const streaming = ['mp4', 'mp3', 'webm'];
 
 // Optimize stream size for 1 second of streaming video
 // 275000 bytes = 2.2M bits = my avg libx264 bitrate @ -crf 26 & -s 640x360 
-const maxChunk = 275000;
+// const maxChunk = 275000;
+const maxChunk = 1048576;
 
 const requestHandler = (req, res) => {
     let url = req.url
